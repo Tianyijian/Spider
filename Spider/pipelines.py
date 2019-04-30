@@ -18,7 +18,7 @@ rds = redis.Redis(host='localhost', port=6379, db=0)
 
 def extract_content(text):
     """
-    移除HTML标签
+    移除HTML标签，删除空格
     :param text:
     :return:
     """
@@ -43,7 +43,9 @@ class UrlPipeline(object):
 
 
 class ViewPipeline(object):
-    result = []
+    result = []     # 存储网页爬取的结果
+    view_num = 0    # 记录写入json的网页数目
+    file_num = 0    # 记录附件的数目
     def process_item(self, item, spider):
         url = item['url'][0]
         if 'title' in item and 'paragraphs' in item:
@@ -60,6 +62,7 @@ class ViewPipeline(object):
             # 判断是否有附件
             if 'file_urls' in item and 'file_name' in item:
                 temp_dict['file_name'] = item['file_name']
+                self.file_num += len(item['file_name'])
                 # 将文件 url 加入redis 队列
                 for url in item['file_urls']:
                     rds.lpush('today_hit_file:urls', url)
@@ -71,7 +74,8 @@ class ViewPipeline(object):
                     for sample in self.result:
                         f.write(json.dumps(sample, ensure_ascii=False) + '\n')
                 self.result.clear()
-                logging.info("--------------------写入json--------------")
+                self.view_num += 100
+                logging.info("----------- write json (view_num: {} file_num: {})-----------".format(self.view_num, self.file_num))
                 # spider.crawler.engine.close_spider(spider, 'Get 1000')
                 # raise CloseSpider('1000')
         return item

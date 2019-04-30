@@ -4,7 +4,7 @@ from scrapy_redis.spiders import RedisSpider
 from scrapy.loader import ItemLoader
 from Spider.items import ViewItem
 
-
+# http://ids.hit.edu.cn/authserver/login?service=http%3A//today.hit.edu.cn/casservice%3Fdestination%3D/article/2019/04/15/65899
 class ViewSpider(RedisSpider):
     name = 'view_spider'
     redis_key = 'today_hit_view:urls'
