@@ -8,6 +8,7 @@ from Spider.items import FileDownloadItem
 class FileSpider(RedisSpider):
     name = 'file_spider'
     redis_key = 'today_hit_file:urls'
+    redis_batch_size = 1
 
     custom_settings = {
         'ITEM_PIPELINES': {

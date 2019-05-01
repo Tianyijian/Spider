@@ -13,7 +13,7 @@
 from datetime import datetime
 today = datetime.now()
 log_file_path = "log/scrapy_{}_{}_{}_{}.log".format(today.month, today.day, today.hour, today.minute)
-LOG_FILE = log_file_path
+# LOG_FILE = log_file_path
 
 # 配置下载文件
 FILES_STORE = 'File'
