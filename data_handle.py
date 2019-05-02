@@ -2,6 +2,7 @@
 import json
 import os
 
+
 def json_remove_repeat():
     """
     去除json文件中相同的网页
@@ -35,10 +36,13 @@ def json_statistic():
     :return: 返回url集合，文件名字集合
     """
     # 读取json文件
+    if not os.path.exists('data/data.json'):
+        print("data.json not exists")
+        return set(), set()
     read_results = []
     with open('data/data.json', encoding='utf-8') as fin:
         read_results = [json.loads(line.strip()) for line in fin.readlines()]
-    url = set()     # 记录url集合
+    url = set()  # 记录url集合
     file_name = []  # 记录文件名字
     url_with_file = 0  # 带附件的网页个数
     for res in read_results:
@@ -49,6 +53,7 @@ def json_statistic():
     value = len(read_results), url_with_file, len(file_name), len(set(file_name))
     print("Url: %d, Url_with_file: %d, total file: %d, no duplication file num: %d" % value)
     return url, set(file_name)
+
 
 def read_json():
     read_results = []
@@ -76,6 +81,7 @@ def read_json():
     # print(file_name_set)
     # print(len(file_name_set))
 
+
 def handle_file():
     url_set, file_set = json_statistic()
     path = "File"
@@ -84,7 +90,7 @@ def handle_file():
     print("remove redundant file in File folder:")
     for file in file_list:
         if file not in file_set:
-            os.remove(path+"/"+file)
+            os.remove(path + "/" + file)
             print(file)
     # 删除json 文件中附件不存在的url
     file_list = os.listdir(path)

@@ -37,5 +37,5 @@ def crawl_file():
 
 if __name__ == '__main__':
     # craw_url()
-    crawl_view()
-    # crawl_file()
+    # crawl_view()
+    crawl_file()

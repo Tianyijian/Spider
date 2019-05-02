@@ -14,7 +14,6 @@ import logging
 from urllib import parse
 import data_handle
 
-
 rds = redis.Redis(host='localhost', port=6379, db=0)
 
 
@@ -40,15 +39,15 @@ class UrlPipeline(object):
 
 
 class ViewPipeline(object):
-    result = []     # 存储网页爬取的结果
-    view_num = 0    # 记录写入json的网页数目
-    file_num = 0    # 记录附件的数目
-    file_url = {}   # 记录文件的url
-    url_set, file_name_set = data_handle.json_statistic()    # 获得当前已有的url,文件名字集合
+    result = []  # 存储网页爬取的结果
+    view_num = 0  # 记录写入json的网页数目
+    file_num = 0  # 记录附件的数目
+    file_url = []  # 记录文件的url
+    url_set, file_name_set = data_handle.json_statistic()  # 获得当前已有的url,文件名字集合
 
     def process_item(self, item, spider):
         url = item['url'][0]
-        if url in self.url_set:     # url已存在，直接返回
+        if url in self.url_set:  # url已存在，直接返回
             return
         self.url_set.add(url)
         if 'title' in item and 'paragraphs' in item:
@@ -74,8 +73,11 @@ class ViewPipeline(object):
                 self.file_name_set = self.file_name_set or set(item['file_name'])
                 # 将文件 url 加入redis 队列
                 for file_url in item['file_urls']:
-                    self.file_url[url] = item['file_urls']
                     rds.lpush('today_hit_file:urls', file_url)
+                # 存储 file_urls
+                file_dict = {}
+                file_dict[url] = item['file_urls']
+                self.file_url.append(file_dict)
             self.result.append(temp_dict)
 
             if len(self.result) >= 10:  # 一定数量时写入文件
@@ -86,15 +88,16 @@ class ViewPipeline(object):
                         f.write(json.dumps(sample, ensure_ascii=False) + '\n')
                 self.result.clear()
                 self.view_num += 10
-                logging.info("----------- write json (view_num: {} file_num: {})-----------".format(self.view_num, self.file_num))
+                logging.info("------- write json (view_num: {} file_num: {})-------".format(self.view_num,
+                                                                                            self.file_num))
                 # 记录文件的 url
                 with open("data/file_url.json", 'a', encoding='utf-8') as f:
                     for line in self.file_url:
                         f.write(json.dumps(line, ensure_ascii=False) + '\n')
+                self.file_url.clear()
                 # spider.crawler.engine.close_spider(spider, 'Get 1000')
                 # raise CloseSpider('1000')
         return item
-
 
 
 class FilePipeline(FilesPipeline):
@@ -107,4 +110,3 @@ class FilePipeline(FilesPipeline):
         :return:
         '''
         return '/%s' % parse.unquote(request.url).split('/')[-1]
-
