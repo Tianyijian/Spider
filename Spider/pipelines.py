@@ -80,7 +80,7 @@ class ViewPipeline(object):
                 self.file_url.append(file_dict)
             self.result.append(temp_dict)
 
-            if len(self.result) >= 10:  # 一定数量时写入文件
+            if len(self.result) >= 10:  # 一定数量时写入文件，批量存储，降低读写次数
                 # logging.info(result)
                 # 写入网页数据
                 with open('data/data.json', 'a', encoding='utf-8') as f:

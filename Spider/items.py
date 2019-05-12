@@ -25,6 +25,7 @@ class ViewItem(scrapy.Item):
     file_name = scrapy.Field()  # 附件名称
     file_urls = scrapy.Field()  # 附件url
 
+
 class FileDownloadItem(scrapy.Item):
     """
     下载附件

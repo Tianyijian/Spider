@@ -5,11 +5,10 @@ import os
 
 def json_remove_repeat():
     """
-    去除json文件中相同的网页
+    去除json文件中相同的网页及多余的网页
     :return:
     """
     # 读取json文件
-    read_results = []
     with open('data/data.json', encoding='utf-8') as fin:
         read_results = [json.loads(line.strip()) for line in fin.readlines()]
     # 删除重复的内容
@@ -39,7 +38,6 @@ def json_statistic():
     if not os.path.exists('data/data.json'):
         print("data.json not exists")
         return set(), set()
-    read_results = []
     with open('data/data.json', encoding='utf-8') as fin:
         read_results = [json.loads(line.strip()) for line in fin.readlines()]
     url = set()  # 记录url集合
@@ -55,34 +53,13 @@ def json_statistic():
     return url, set(file_name)
 
 
-def read_json():
-    read_results = []
-    with open('data.json', encoding='utf-8') as fin:
-        read_results = [json.loads(line.strip()) for line in fin.readlines()]
-    print(len(read_results))
-    file_name = []
-    file_num = 0
-    view_url = set()
-    for res in read_results:
-        if res['url'] in view_url:
-            print(res['url'])
-        view_url.add(res['url'])
-        if len(res['file_name']):
-            file_num += len(res['file_name'])
-            file_name += res['file_name']
-    print("view_url: " + str(len(view_url)))
-    print(len(file_name))
-    print("file_num: " + str(file_num))
-    print(file_name[0:4])
-    print(len(file_name))
-    print(len(set(file_name)))
-
-    # file_name_set = set(file for file in file_name)
-    # print(file_name_set)
-    # print(len(file_name_set))
-
-
 def handle_file():
+    """
+    删除多余的附件（没有在json文件中记录）
+    删除json文件中有误的记录（其记录的附件名字在实际下载文件中不存在）
+    删除json文件中附件名字重复的记录
+    :return:
+    """
     url_set, file_set = json_statistic()
     path = "File"
     file_list = os.listdir(path)
@@ -96,7 +73,6 @@ def handle_file():
     file_list = os.listdir(path)
     print("remove missing file's url in json :")
     # 读取json文件
-    read_results = []
     with open('data/data.json', encoding='utf-8') as fin:
         read_results = [json.loads(line.strip()) for line in fin.readlines()]
     results = []
@@ -126,7 +102,5 @@ def handle_file():
 
 
 if __name__ == '__main__':
-    # read_json()
     json_remove_repeat()
-    url_set, file_set = json_statistic()
     handle_file()
